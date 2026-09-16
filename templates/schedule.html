@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Расписание — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="welcome">
+    <h1>Расписание</h1>
+    <p>Расписание занятий на неделю.</p>
+</div>
+
+<div class="section">
+    <table>
+        <thead>
+            <tr><th>Урок</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Математика</td><td>Физика</td><td>Русский язык</td><td>История</td><td>Химия</td></tr>
+            <tr><td>2</td><td>Биология</td><td>Химия</td><td>Математика</td><td>Физика</td><td>Английский</td></tr>
+            <tr><td>3</td><td>Английский</td><td>История</td><td>Биология</td><td>Русский язык</td><td>Математика</td></tr>
+        </tbody>
+    </table>
+    <p style="margin-top:14px;color:#8a96b3;font-size:13px;">Расписание фиксированное, привязка к конкретным классам — в разработке.</p>
+</div>
+{% endblock %}

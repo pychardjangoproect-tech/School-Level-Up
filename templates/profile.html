@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Профиль — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="welcome"><h1>👤 Профиль</h1></div>
+
+<div class="section">
+    <form method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label>Логин (код)</label>
+            <input type="text" value="{{ user.username }}" disabled>
+        </div>
+        <div class="field">
+            <label>Имя</label>
+            <input type="text" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <button type="submit" class="btn">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

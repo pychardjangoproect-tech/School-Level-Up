@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Новости — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="welcome"><h1>📰 Новости</h1></div>
+
+<div class="section">
+    {% for news in news_list %}
+        <div class="news-item">
+            <h3>{{ news.title }}</h3>
+            <p>{{ news.content }}</p>
+            <div class="date">{{ news.created_at|date:"d.m.Y H:i" }}</div>
+        </div>
+    {% empty %}
+        <p>Новостей пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

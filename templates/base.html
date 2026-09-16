@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NAIMA Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<nav class="topbar">
+    <div class="topbar-inner">
+        <div class="logo-circle"><div class="diamond"></div></div>
+        <h1 class="brand">NAIMA Portal</h1>
+
+        <div class="nav-grid">
+            <a href="{% url 'home' %}" class="nav-pill {% if request.resolver_match.url_name == 'home' %}active{% endif %}">🏠 Главная</a>
+            <a href="{% url 'rating' %}" class="nav-pill {% if request.resolver_match.url_name == 'rating' %}active{% endif %}">🏆 Рейтинг</a>
+            <a href="{% url 'schedule' %}" class="nav-pill {% if request.resolver_match.url_name == 'schedule' %}active{% endif %}">🗓️ Расписание</a>
+            <a href="{% url 'news_list' %}" class="nav-pill {% if request.resolver_match.url_name == 'news_list' %}active{% endif %}">📰 Новости</a>
+        </div>
+
+        {% if user.is_authenticated %}
+            {% if user.student_profile %}
+                <a href="{% url 'student_dashboard' %}" class="nav-link-plain">🎓 Мой кабинет</a>
+            {% elif user.teacher_profile %}
+                <a href="{% url 'teacher_dashboard' %}" class="nav-link-plain">🧑‍🏫 Кабинет учителя</a>
+            {% endif %}
+            <a href="{% url 'profile' %}" class="nav-link-plain">👤 Профиль</a>
+            <a href="{% url 'logout' %}" class="logout-pill">🚪 Выйти</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="logout-pill">🔑 Войти</a>
+            <a href="{% url 'register' %}" class="nav-link-plain">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+
+<main class="container">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

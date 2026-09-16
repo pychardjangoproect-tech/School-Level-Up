@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Мой кабинет — School Level Up{% endblock %}
+{% block content %}
+<div class="welcome">
+    <h1>Привет, {{ user.first_name }} 👋</h1>
+    <p>Ваш класс: {{ student.classroom.name }}</p>
+</div>
+
+<div class="card">
+    <div class="icon">👤</div>
+    <h2>Ваш средний балл</h2>
+    <div class="value">{% if avg_score %}{{ avg_score }}{% else %}—{% endif %}</div>
+</div>
+
+<div class="section">
+    <h2>📝 Мои оценки</h2>
+    <ul class="grades-list">
+        {% for grade in grades %}
+        <li>
+            <span>{{ grade.subject.name }} — {{ grade.teacher.user.first_name }}</span>
+            <span class="grade-badge">{{ grade.grade }}</span>
+        </li>
+        {% empty %}
+        <li>Оценок пока нет.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Рейтинг — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="welcome">
+    <h1>🏆 Рейтинг классов</h1>
+    <p>Неделя: {{ week_start|date:"d.m.Y" }} — {{ week_end|date:"d.m.Y" }}</p>
+</div>
+
+<div class="section">
+    <table>
+        <thead>
+            <tr><th>Место</th><th>Класс</th><th>Учеников</th><th>Балл</th></tr>
+        </thead>
+        <tbody>
+            {% for item in rating_data %}
+            <tr>
+                <td class="medal">{{ item.medal }}</td>
+                <td>{{ item.class.name }}</td>
+                <td>{{ item.student_count }}</td>
+                <td>{{ item.average }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">Пока нет данных</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

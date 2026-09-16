@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Кабинет учителя — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="welcome">
+    <h1>Кабинет учителя</h1>
+    <p>{{ teacher.user.first_name }}</p>
+</div>
+
+<div class="section">
+    <h2>Поставить оценку</h2>
+    {% for classroom in classes %}
+    <div class="class-block">
+        <h3>{{ classroom.name }}</h3>
+        {% for student in classroom.students.all %}
+        <form method="post" action="{% url 'add_grade' %}" class="grade-form">
+            {% csrf_token %}
+            <input type="hidden" name="student_id" value="{{ student.id }}">
+            <span style="min-width:140px;">{{ student.user.first_name }} {{ student.user.last_name }}</span>
+            <select name="subject_id">
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="grade">
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+            </select>
+            <button type="submit">Поставить</button>
+        </form>
+        {% empty %}
+        <p style="color:#8a96b3;">В классе пока нет учеников.</p>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="section">
+    <h2>Последние поставленные оценки</h2>
+    <ul class="grades-list">
+        {% for grade in recent_grades %}
+        <li>
+            <span>{{ grade.student.user.first_name }} {{ grade.student.user.last_name }} — {{ grade.subject.name }}</span>
+            <span>
+                <span class="grade-badge">{{ grade.grade }}</span>
+                <a href="{% url 'delete_grade' grade.id %}" style="color:#c0392b;font-size:12px;margin-left:8px;">удалить</a>
+            </span>
+        </li>
+        {% empty %}
+        <li>Вы ещё не ставили оценок.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

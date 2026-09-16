@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Ошибка — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="section" style="text-align:center;">
+    <h2>⚠️ {{ message|default:"Произошла ошибка" }}</h2>
+    <a href="{% url 'home' %}" class="btn" style="display:inline-block;width:auto;margin-top:16px;">На главную</a>
+</div>
+{% endblock %}

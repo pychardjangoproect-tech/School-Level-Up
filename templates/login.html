@@ -1,0 +1,28 @@
+{% extends 'auth_base.html' %}
+{% block title %}Вход — NAIMA Portal{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="form-card">
+        <div class="logo-circle-standalone"><div class="diamond"></div></div>
+        <h1>NAIMA Portal</h1>
+        <p class="subtitle">Единая школьная система</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label>Логин</label>
+                <input type="text" name="username" maxlength="13" placeholder="Ваш код" required>
+            </div>
+            <div class="field">
+                <label>Пароль</label>
+                <input type="password" name="password" placeholder="Ваш код" required>
+            </div>
+            <button type="submit" class="btn">Войти</button>
+        </form>
+
+        <div class="link-row">
+            Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

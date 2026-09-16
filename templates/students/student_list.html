@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Инфо ученика -->
+    <div class="card">
+        <h3>👤 Мой профиль</h3>
+        <p><strong>Имя:</strong> {{ student.user.first_name }}</p>
+        <p><strong>Фамилия:</strong> {{ student.user.last_name }}</p>
+        <p><strong>Класс:</strong> {{ student.classroom.name }}</p>
+        <p><strong>Мой код:</strong> <span style="font-weight: bold; color: var(--primary);">{{ student.user.reg_code }}</span></p>
+    </div>
+
+    <!-- Мои оценки -->
+    <div class="card" style="grid-column: span 2;">
+        <h3>📝 Мои оценки</h3>
+        <table class="rating-table">
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Оценка</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr>
+                    <td>{{ grade.teacher_subject_class.subject.name }}</td>
+                    <td><strong>{{ grade.grade }}</strong></td>
+                    <td>{{ grade.date|date:"d.m.Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center;">Оценок пока нет.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
