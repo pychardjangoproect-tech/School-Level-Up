@@ -1,0 +1,200 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef1f6;
+    color: #1a2b4c;
+}
+
+/* ---- Верхняя синяя шапка ---- */
+.topbar {
+    background: linear-gradient(160deg, #12336b, #1d4d91);
+    padding: 28px 20px 22px;
+    border-radius: 0 0 26px 26px;
+}
+
+.topbar-inner {
+    max-width: 420px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-circle {
+    width: 54px;
+    height: 54px;
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.diamond {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #12336b, #4a7fc9);
+    transform: rotate(45deg);
+    border-radius: 4px;
+}
+
+.brand {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    letter-spacing: 0.2px;
+}
+
+.nav-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.nav-pill {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    padding: 13px 10px;
+    border-radius: 14px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .15s;
+}
+.nav-pill:hover { background: rgba(255,255,255,0.18); }
+.nav-pill.active { background: #fff; color: #12336b; font-weight: 700; }
+
+.nav-link-plain {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    opacity: 0.9;
+}
+.nav-link-plain:hover { opacity: 1; text-decoration: underline; }
+
+.logout-pill {
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.14);
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14px;
+}
+.logout-pill:hover { background: rgba(255,255,255,0.24); }
+
+/* ---- Контейнер ---- */
+.container { max-width: 420px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* ---- Приветствие ---- */
+.welcome { margin: 22px 0 18px; text-align: left; }
+.welcome h1 { color: #12336b; font-size: 24px; font-weight: 800; }
+.welcome p { color: #6c7896; margin-top: 4px; font-size: 14px; }
+
+/* ---- Карточки ---- */
+.card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 26px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(18,51,107,0.08);
+    text-align: center;
+}
+.card .icon { font-size: 34px; margin-bottom: 10px; }
+.card h2 { color: #4a5773; font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.card .value { font-size: 34px; font-weight: 800; color: #1d4d91; }
+
+/* ---- Секции ---- */
+.section { background: #fff; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(18,51,107,0.06); }
+.section h2 { color: #12336b; margin-bottom: 14px; font-size: 17px; font-weight: 700; }
+
+.news-item { background: #f4f7fc; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+.news-item h3 { color: #1d4d91; font-size: 15px; margin-bottom: 4px; }
+.news-item p { color: #4a5773; font-size: 14px; }
+.news-item .date { font-size: 12px; color: #98a3bd; margin-top: 6px; }
+
+/* ---- Таблицы ---- */
+table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+thead tr { background: #12336b; color: #fff; }
+th, td { padding: 12px 14px; text-align: left; font-size: 14px; }
+tbody tr:nth-child(even) { background: #f5f8fc; }
+tbody tr:hover { background: #eaf0fb; }
+.medal { font-size: 18px; }
+
+/* ---- Формы ---- */
+.auth-wrap { display: flex; justify-content: center; padding-top: 40px; }
+.form-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 34px 28px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(18,51,107,0.12);
+}
+.form-card .logo-circle-standalone {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, #12336b, #1d4d91);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.form-card .logo-circle-standalone .diamond { background: #fff; }
+.form-card h1 { color: #12336b; font-size: 26px; font-weight: 800; }
+.form-card .subtitle { color: #8a96b3; margin: 4px 0 26px; font-size: 14px; }
+
+.field { margin-bottom: 18px; text-align: left; }
+.field label { display: block; font-weight: 600; color: #2a3a5c; margin-bottom: 6px; font-size: 14px; }
+.field input, .field select {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d7deec;
+    border-radius: 12px;
+    font-size: 15px;
+    background: #fbfcfe;
+}
+.field input:focus, .field select:focus { outline: none; border-color: #1d4d91; }
+
+.btn {
+    width: 100%;
+    padding: 15px;
+    background: #12336b;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn:hover { background: #1d4d91; }
+
+.link-row { text-align: center; margin-top: 18px; font-size: 14px; color: #6c7896; }
+.link-row a { color: #1d4d91; font-weight: 600; text-decoration: none; }
+
+/* ---- Сообщения ---- */
+.messages { margin-bottom: 16px; }
+.alert { padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
+.alert-success { background: #e3f8ec; color: #1c7c43; }
+.alert-error { background: #fdeaea; color: #c0392b; }
+.alert-info { background: #e8f1fd; color: #1d4d91; }
+
+/* ---- Оценки / кабинеты ---- */
+.grades-list { list-style: none; }
+.grades-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eef1f6; font-size: 14px; }
+.grade-badge { display: inline-block; width: 26px; height: 26px; border-radius: 8px; background: #1d4d91; color: #fff; text-align: center; line-height: 26px; font-weight: 700; }
+
+.class-block { margin-bottom: 24px; }
+.class-block h3 { color: #12336b; margin-bottom: 10px; }
+.grade-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.grade-form select { padding: 6px 10px; border-radius: 8px; border: 1px solid #d7deec; }
+.grade-form button { padding: 6px 12px; border-radius: 8px; border: none; background: #1d4d91; color: #fff; cursor: pointer; }

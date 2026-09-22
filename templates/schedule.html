@@ -1,22 +1,133 @@
 {% extends 'base.html' %}
-{% block title %}Расписание — NAIMA Portal{% endblock %}
+{% load static %}
+
 {% block content %}
-<div class="welcome">
-    <h1>Расписание</h1>
-    <p>Расписание занятий на неделю.</p>
+<div class="section-title">📅 Расписание занятий</div>
+
+<div class="schedule-card">
+    <p class="schedule-subtitle">Расписание занятий на неделю.</p>
+
+    <div class="schedule-table-wrapper">
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Урок</th>
+                    <th>Пн</th>
+                    <th>Вт</th>
+                    <th>Ср</th>
+                    <th>Чт</th>
+                    <th>Пт</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Математика</td>
+                    <td>Физика</td>
+                    <td>Русский язык</td>
+                    <td>История</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Биология</td>
+                    <td>Химия</td>
+                    <td>Математика</td>
+                    <td>Физика</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Английский</td>
+                    <td>История</td>
+                    <td>Биология</td>
+                    <td>Русский язык</td>
+                    <td>—</td>
+                </tr>
+                <!-- Добавьте столько строк, сколько нужно -->
+            </tbody>
+        </table>
+    </div>
+
+    <p class="schedule-note">
+        Расписание фиксированное, привязка к конкретным классам — в разработке.
+    </p>
 </div>
 
-<div class="section">
-    <table>
-        <thead>
-            <tr><th>Урок</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>1</td><td>Математика</td><td>Физика</td><td>Русский язык</td><td>История</td><td>Химия</td></tr>
-            <tr><td>2</td><td>Биология</td><td>Химия</td><td>Математика</td><td>Физика</td><td>Английский</td></tr>
-            <tr><td>3</td><td>Английский</td><td>История</td><td>Биология</td><td>Русский язык</td><td>Математика</td></tr>
-        </tbody>
-    </table>
-    <p style="margin-top:14px;color:#8a96b3;font-size:13px;">Расписание фиксированное, привязка к конкретным классам — в разработке.</p>
+<div style="margin-top:20px;">
+    <a href="{% url 'home' %}" style="color:#1e3a8a; text-decoration:none;">← На главную</a>
 </div>
+
+<style>
+    .schedule-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 28px 24px 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+    .schedule-subtitle {
+        font-size: 15px;
+        color: #5a6b7a;
+        margin-bottom: 20px;
+    }
+    .schedule-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .schedule-table {
+        width: 100%;
+        min-width: 600px; /* чтобы на телефоне была горизонтальная прокрутка */
+        border-collapse: collapse;
+        background: #ffffff;
+    }
+    .schedule-table th {
+        background: #1e3a8a; /* тёмно-синий, как шапка */
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 14px 12px;
+        text-align: left;
+        white-space: nowrap;
+    }
+    .schedule-table th:first-child {
+        border-top-left-radius: 16px;
+    }
+    .schedule-table th:last-child {
+        border-top-right-radius: 16px;
+    }
+    .schedule-table td {
+        padding: 14px 12px;
+        font-size: 15px;
+        color: #1e2a3a;
+        border-bottom: 1px solid #eef2f6;
+    }
+    .schedule-table tbody tr:nth-child(even) {
+        background: #f9fbfd;
+    }
+    .schedule-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .schedule-table td:first-child {
+        font-weight: 700;
+        color: #1e3a8a;
+    }
+    .schedule-note {
+        margin-top: 18px;
+        font-size: 14px;
+        color: #8a9aa8;
+        line-height: 1.4;
+    }
+    @media (max-width: 600px) {
+        .schedule-card {
+            padding: 20px 16px;
+        }
+        .schedule-table th,
+        .schedule-table td {
+            padding: 10px 8px;
+            font-size: 14px;
+        }
+    }
+</style>
 {% endblock %}

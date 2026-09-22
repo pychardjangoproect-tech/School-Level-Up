@@ -1,20 +1,170 @@
 {% extends 'base.html' %}
-{% block title %}Профиль — NAIMA Portal{% endblock %}
-{% block content %}
-<div class="welcome"><h1>👤 Профиль</h1></div>
+{% load static %}
 
-<div class="section">
-    <form method="post">
+{% block content %}
+<div class="section-title">👤 Мой профиль</div>
+
+<!-- ИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ -->
+<div class="profile-card">
+    <form method="post" action="{% url 'profile' %}" class="profile-form">
         {% csrf_token %}
-        <div class="field">
-            <label>Логин (код)</label>
+
+        <div class="profile-row">
+            <label>Логин</label>
             <input type="text" value="{{ user.username }}" disabled>
         </div>
-        <div class="field">
+
+        <div class="profile-row">
             <label>Имя</label>
-            <input type="text" name="first_name" value="{{ user.first_name }}">
+            <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Введите имя">
         </div>
-        <button type="submit" class="btn">Сохранить</button>
+
+        <div class="profile-row">
+            <label>Роль</label>
+            <input type="text" value="{% if user.is_superuser %}Администратор{% elif teacher %}Учитель{% elif student %}Ученик{% else %}Пользователь{% endif %}" disabled>
+        </div>
+
+        {% if student %}
+        <div class="profile-row">
+            <label>Класс</label>
+            <input type="text" value="{{ student.classroom.name }}" disabled>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn-primary">Сохранить</button>
     </form>
 </div>
+
+<!-- БЛОК УЧЕНИКА -->
+{% if student %}
+    <div class="section-title">📊 Моя статистика</div>
+    <div class="cards">
+        <div class="card-item">
+            <div class="label">Мой балл</div>
+            <div class="value green">
+                {% if user_score %}{{ user_score }}{% else %}—{% endif %}
+            </div>
+        </div>
+        <div class="card-item">
+            <div class="label">Балл класса</div>
+            <div class="value gold">
+                {% if class_avg_score %}{{ class_avg_score }}{% else %}—{% endif %}
+            </div>
+        </div>
+        <div class="card-item">
+            <div class="label">Место класса</div>
+            <div class="value">
+                {% if class_position %}{{ class_position }} из {{ total_classes }}{% else %}—{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">📝 Последние оценки</div>
+    <div class="rating-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Оценка</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                    <tr>
+                        <td>{{ grade.teacher_subject_class.subject.name }}</td>
+                        <td class="score">{{ grade.grade }}</td>
+                        <td>{{ grade.date|date:"d.m.Y" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" style="text-align:center; color:#6b7280;">Оценок пока нет</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<!-- БЛОК УЧИТЕЛЯ -->
+{% if teacher %}
+    <div class="section-title">📚 Мои предметы и классы</div>
+    <div class="rating-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Класс</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assign in assignments %}
+                    <tr>
+                        <td>{{ assign.subject.name }}</td>
+                        <td>{{ assign.classroom.name }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="2" style="text-align:center; color:#6b7280;">Нет назначений</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<div style="margin-top:24px;">
+    <a href="{% url 'home' %}" style="color:#1e3a8a; text-decoration:none;">← На главную</a>
+</div>
+
+<style>
+    .profile-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 28px 24px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        margin-bottom: 28px;
+    }
+    .profile-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .profile-row {
+        display: flex;
+        flex-direction: column;
+    }
+    .profile-row label {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1e2a3a;
+        margin-bottom: 6px;
+    }
+    .profile-row input {
+        padding: 14px 16px;
+        border: 2px solid #e0e6ee;
+        border-radius: 12px;
+        font-size: 16px;
+        background: #ffffff;
+        transition: border 0.2s;
+    }
+    .profile-row input:focus {
+        border-color: #1e3a8a;
+        outline: none;
+    }
+    .profile-row input:disabled {
+        background: #f4f7fc;
+        color: #6b7280;
+    }
+    .btn-primary {
+        background: #1e3a8a;
+        color: #fff;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+</style>
 {% endblock %}

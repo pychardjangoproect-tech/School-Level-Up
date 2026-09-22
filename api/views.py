@@ -70,7 +70,6 @@ def home(request):
         return redirect('register')
 
     week_start, week_end = get_current_week()
-
     rating_data = calculate_class_rating(week_start, week_end)
     top_rating = [item for item in rating_data if item['student_count'] > 0][:5]
 
@@ -104,6 +103,7 @@ def home(request):
         'news_list': news_list,
     }
     return render(request, 'home.html', context)
+
 
 @ensure_csrf_cookie
 def register_view(request):
@@ -158,6 +158,8 @@ def register_view(request):
             return redirect('teacher_dashboard')
 
     return render(request, 'register.html')
+
+
 @ensure_csrf_cookie
 def login_view(request):
     if request.method == 'POST':
@@ -203,6 +205,8 @@ def student_dashboard(request):
     return render(request, 'students/student_dashboard.html', context)
 
 
+import json  # добавьте в начало файла, если ещё нет
+
 @login_required
 def teacher_dashboard(request):
     try:
@@ -210,19 +214,34 @@ def teacher_dashboard(request):
     except Teacher.DoesNotExist:
         return render(request, 'error.html', {'message': 'Вы не являетесь учителем'})
 
-    classes = ClassRoom.objects.prefetch_related('students__user').all()
+    # Собираем данные о классах и их учениках для JS-фильтрации
+    classes_data = {}
+    for cls in ClassRoom.objects.all():
+        students = Student.objects.filter(classroom=cls).select_related('user')
+        classes_data[str(cls.id)] = {
+            'name': cls.name,
+            'students': [
+                {
+                    'id': s.id,
+                    'name': (f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username)
+                }
+                for s in students
+            ]
+        }
+
     subjects = Subject.objects.all()
-    recent_grades = Grade.objects.filter(teacher=teacher).select_related('student__user', 'subject').order_by('-date')[:20]
+    recent_grades = Grade.objects.filter(teacher=teacher).select_related(
+        'student__user', 'subject'
+    ).order_by('-date')[:15]
 
     context = {
         'teacher': teacher,
-        'classes': classes,
+        'all_classes': ClassRoom.objects.all(),
+        'classes_data_json': json.dumps(classes_data, ensure_ascii=False),
         'subjects': subjects,
         'recent_grades': recent_grades,
     }
     return render(request, 'teachers/teacher_dashboard.html', context)
-
-
 @login_required
 def add_grade(request):
     if request.method == 'POST':
@@ -268,6 +287,7 @@ def delete_grade(request, grade_id):
 
 @login_required
 def profile_view(request):
+    """Личный кабинет пользователя с оценками и рейтингом"""
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         if first_name:
@@ -275,26 +295,92 @@ def profile_view(request):
             request.user.save()
             messages.success(request, 'Имя обновлено!')
             return redirect('profile')
-    return render(request, 'profile.html', {'user': request.user})
+
+    user = request.user
+    student = None
+    teacher = None
+    user_score = None
+    class_avg_score = None
+    class_position = None
+    total_classes = None
+    grades = []
+    recent_grades = []
+
+    try:
+        student = Student.objects.get(user=user)
+    except Student.DoesNotExist:
+        pass
+
+    try:
+        teacher = Teacher.objects.get(user=user)
+    except Teacher.DoesNotExist:
+        pass
+
+    if student:
+        user_grades = Grade.objects.filter(student=student)
+        if user_grades.exists():
+            user_score = round(sum(g.get_percent() for g in user_grades) / user_grades.count(), 1)
+
+        class_students = Student.objects.filter(classroom=student.classroom)
+        if class_students.exists():
+            all_class_grades = Grade.objects.filter(student__in=class_students)
+            if all_class_grades.exists():
+                class_avg_score = round(sum(g.get_percent() for g in all_class_grades) / all_class_grades.count(), 1)
+
+        grades = Grade.objects.filter(student=student).select_related('subject').order_by('-date')[:10]
+
+        # Место класса в рейтинге
+        all_classes = ClassRoom.objects.all()
+        class_ratings = []
+        for cls in all_classes:
+            cls_students = Student.objects.filter(classroom=cls)
+            if not cls_students.exists():
+                continue
+            cls_grades = Grade.objects.filter(student__in=cls_students)
+            if cls_grades.exists():
+                avg = round(sum(g.get_percent() for g in cls_grades) / cls_grades.count(), 1)
+            else:
+                avg = 0
+            class_ratings.append({'class': cls, 'average': avg})
+        class_ratings.sort(key=lambda x: x['average'], reverse=True)
+        total_classes = len(class_ratings)
+        for i, item in enumerate(class_ratings):
+            if item['class'] == student.classroom:
+                class_position = i + 1
+                break
+
+    if teacher:
+        recent_grades = Grade.objects.filter(teacher=teacher).select_related('student__user', 'subject').order_by('-date')[:10]
+
+    context = {
+        'user': user,
+        'student': student,
+        'teacher': teacher,
+        'user_score': user_score,
+        'class_avg_score': class_avg_score,
+        'class_position': class_position,
+        'total_classes': total_classes,
+        'grades': grades,
+        'recent_grades': recent_grades,
+    }
+    return render(request, 'profile.html', context)
 
 
+# ==================== РАСПИСАНИЕ ====================
 def schedule_view(request):
     return render(request, 'schedule.html')
 
 
+# ==================== ВСЕ НОВОСТИ ====================
 def news_list_view(request):
     news_list = News.objects.all().order_by('-created_at')
     return render(request, 'news_list.html', {'news_list': news_list})
 
 
+# ==================== ПОЛНЫЙ РЕЙТИНГ ====================
 def rating_view(request):
     week_start, week_end = get_current_week()
     rating_data = calculate_class_rating(week_start, week_end)
+    # оставляем только классы с учениками
     rating_data = [item for item in rating_data if item['student_count'] > 0]
-
-    context = {
-        'rating_data': rating_data,
-        'week_start': week_start,
-        'week_end': week_end,
-    }
-    return render(request, 'rating.html', context)
+    return render(request, 'rating.html', {'rating_data': rating_data})

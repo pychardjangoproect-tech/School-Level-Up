@@ -1,55 +1,355 @@
 {% extends 'base.html' %}
-{% block title %}Кабинет учителя — NAIMA Portal{% endblock %}
+{% load static %}
+
 {% block content %}
-<div class="welcome">
-    <h1>Кабинет учителя</h1>
-    <p>{{ teacher.user.first_name }}</p>
+<div class="section-title">👨‍🏫 Кабинет учителя</div>
+
+<!-- Инфо об учителе -->
+<div class="teacher-info">
+    <p><strong>Имя:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+    <p><strong>Логин:</strong> {{ user.username }}</p>
 </div>
 
-<div class="section">
-    <h2>Поставить оценку</h2>
-    {% for classroom in classes %}
-    <div class="class-block">
-        <h3>{{ classroom.name }}</h3>
-        {% for student in classroom.students.all %}
-        <form method="post" action="{% url 'add_grade' %}" class="grade-form">
-            {% csrf_token %}
-            <input type="hidden" name="student_id" value="{{ student.id }}">
-            <span style="min-width:140px;">{{ student.user.first_name }} {{ student.user.last_name }}</span>
-            <select name="subject_id">
-                {% for subject in subjects %}
-                <option value="{{ subject.id }}">{{ subject.name }}</option>
+<!-- ФОРМА ВЫСТАВЛЕНИЯ ОЦЕНКИ -->
+<div class="grade-form-card">
+    <h3>📝 Поставить оценку</h3>
+
+    <form method="post" action="{% url 'add_grade' %}" id="gradeForm">
+        {% csrf_token %}
+
+        <!-- 1. КЛАСС -->
+        <div class="form-group">
+            <label><span class="step">1</span> Класс</label>
+            <select id="class_select" class="form-control" required>
+                <option value="">— Выберите класс —</option>
+                {% for cls in all_classes %}
+                    <option value="{{ cls.id }}">{{ cls.name }}</option>
                 {% endfor %}
             </select>
-            <select name="grade">
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
+        </div>
+
+        <!-- 2. ПРЕДМЕТ -->
+        <div class="form-group">
+            <label><span class="step">2</span> Предмет</label>
+            <select id="subject_select" name="subject_id" class="form-control" required disabled>
+                <option value="">— Сначала выберите класс —</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
             </select>
-            <button type="submit">Поставить</button>
-        </form>
-        {% empty %}
-        <p style="color:#8a96b3;">В классе пока нет учеников.</p>
-        {% endfor %}
-    </div>
+        </div>
+
+        <!-- 3. УЧЕНИК -->
+        <div class="form-group">
+            <label><span class="step">3</span> Ученик</label>
+            <select id="student_select" name="student_id" class="form-control" required disabled>
+                <option value="">— Сначала выберите класс —</option>
+            </select>
+        </div>
+
+        <!-- 4. ОЦЕНКА -->
+        <div class="form-group">
+            <label><span class="step">4</span> Оценка</label>
+            <div class="grade-picker">
+                <label class="grade-radio">
+                    <input type="radio" name="grade" value="5" disabled required>
+                    <span class="grade-badge grade-5">5</span>
+                </label>
+                <label class="grade-radio">
+                    <input type="radio" name="grade" value="4" disabled>
+                    <span class="grade-badge grade-4">4</span>
+                </label>
+                <label class="grade-radio">
+                    <input type="radio" name="grade" value="3" disabled>
+                    <span class="grade-badge grade-3">3</span>
+                </label>
+                <label class="grade-radio">
+                    <input type="radio" name="grade" value="2" disabled>
+                    <span class="grade-badge grade-2">2</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit" disabled>Поставить оценку</button>
+    </form>
+</div>
+
+<!-- ПОСЛЕДНИЕ ОЦЕНКИ -->
+<div class="section-title" style="margin-top: 28px;">📊 Последние поставленные оценки</div>
+<div class="recent-grades">
+    {% for grade in recent_grades %}
+        <div class="grade-item">
+            <span class="grade-name">{{ grade.student.user.first_name }} {{ grade.student.user.last_name }}</span>
+            <span class="grade-subject">{{ grade.subject.name }}</span>
+            <span class="grade-value grade-{{ grade.grade }}">{{ grade.grade }}</span>
+            <span class="grade-date">{{ grade.date|date:"d.m.Y H:i" }}</span>
+        </div>
+    {% empty %}
+        <p style="color:#6b7280; text-align:center; padding:20px;">Оценок пока нет</p>
     {% endfor %}
 </div>
 
-<div class="section">
-    <h2>Последние поставленные оценки</h2>
-    <ul class="grades-list">
-        {% for grade in recent_grades %}
-        <li>
-            <span>{{ grade.student.user.first_name }} {{ grade.student.user.last_name }} — {{ grade.subject.name }}</span>
-            <span>
-                <span class="grade-badge">{{ grade.grade }}</span>
-                <a href="{% url 'delete_grade' grade.id %}" style="color:#c0392b;font-size:12px;margin-left:8px;">удалить</a>
-            </span>
-        </li>
-        {% empty %}
-        <li>Вы ещё не ставили оценок.</li>
-        {% endfor %}
-    </ul>
-</div>
+<!-- Данные о классах для JS -->
+<script id="classes-data" type="application/json">{{ classes_data_json|safe }}</script>
+
+<style>
+    /* --- Инфо об учителе --- */
+    .teacher-info {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .teacher-info p {
+        margin: 4px 0;
+        font-size: 15px;
+        color: #1e2a3a;
+    }
+
+    /* --- Карточка формы --- */
+    .grade-form-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 28px 24px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        max-width: 640px;
+    }
+    .grade-form-card h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 24px;
+    }
+
+    /* --- Шаги --- */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 15px;
+        color: #1e2a3a;
+        margin-bottom: 8px;
+    }
+    .step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: #1e3a8a;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 700;
+        margin-right: 10px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e0e6ee;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #fff;
+        transition: border 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+        outline: none;
+    }
+    .form-control:disabled {
+        background: #f4f7fc;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    /* --- Оценка (радио-кнопки) --- */
+    .grade-picker {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .grade-radio {
+        cursor: pointer;
+        position: relative;
+    }
+    .grade-radio input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .grade-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+        opacity: 0.35;
+    }
+    .grade-radio input:checked + .grade-badge {
+        opacity: 1;
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    }
+    .grade-radio input:not(:disabled) + .grade-badge:hover {
+        opacity: 0.8;
+    }
+    .grade-radio input:disabled + .grade-badge {
+        cursor: not-allowed;
+    }
+    .grade-5 { background: #22c55e; }
+    .grade-4 { background: #3b82f6; }
+    .grade-3 { background: #f59e0b; }
+    .grade-2 { background: #ef4444; }
+
+    /* --- Кнопка --- */
+    .btn-submit {
+        margin-top: 12px;
+        width: 100%;
+        padding: 16px;
+        background: #1e3a8a;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    .btn-submit:hover:not(:disabled) {
+        background: #2563eb;
+    }
+    .btn-submit:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+    .btn-submit:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+    }
+
+    /* --- Последние оценки --- */
+    .recent-grades {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .grade-item {
+        display: grid;
+        grid-template-columns: 2fr 2fr 60px 1fr;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f4f8;
+        font-size: 14px;
+    }
+    .grade-item:last-child {
+        border-bottom: none;
+    }
+    .grade-name {
+        font-weight: 600;
+        color: #1e2a3a;
+    }
+    .grade-subject {
+        color: #5a6b7a;
+    }
+    .grade-value {
+        font-weight: 700;
+        font-size: 18px;
+        text-align: center;
+        padding: 4px 8px;
+        border-radius: 8px;
+        color: #fff;
+    }
+    .grade-date {
+        color: #9ca3af;
+        font-size: 13px;
+        text-align: right;
+    }
+
+    @media (max-width: 640px) {
+        .grade-item {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .grade-date {
+            grid-column: span 2;
+            text-align: left;
+        }
+        .grade-badge {
+            width: 52px;
+            height: 52px;
+            font-size: 20px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const classesData = JSON.parse(document.getElementById('classes-data').textContent);
+
+        const classSelect   = document.getElementById('class_select');
+        const subjectSelect = document.getElementById('subject_select');
+        const studentSelect = document.getElementById('student_select');
+        const gradeRadios   = document.querySelectorAll('input[name="grade"]');
+        const submitBtn     = document.querySelector('.btn-submit');
+
+        function updateSubmitState() {
+            const gradePicked = document.querySelector('input[name="grade"]:checked');
+            submitBtn.disabled = !(
+                classSelect.value &&
+                subjectSelect.value &&
+                studentSelect.value &&
+                gradePicked
+            );
+        }
+
+        classSelect.addEventListener('change', function () {
+            const clsId = this.value;
+
+            subjectSelect.value = '';
+            document.querySelectorAll('input[name="grade"]').forEach(r => { r.checked = false; });
+
+            if (!clsId) {
+                subjectSelect.disabled = true;
+                studentSelect.disabled = true;
+                gradeRadios.forEach(r => r.disabled = true);
+                studentSelect.innerHTML = '<option value="">— Сначала выберите класс —</option>';
+                updateSubmitState();
+                return;
+            }
+
+            const students = (classesData[clsId] && classesData[clsId].students) || [];
+            studentSelect.innerHTML = '<option value="">— Выберите ученика —</option>';
+            students.forEach(function (s) {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                studentSelect.appendChild(opt);
+            });
+
+            subjectSelect.disabled = false;
+            studentSelect.disabled = false;
+            gradeRadios.forEach(r => r.disabled = false);
+
+            updateSubmitState();
+        });
+
+        subjectSelect.addEventListener('change', updateSubmitState);
+        studentSelect.addEventListener('change', updateSubmitState);
+        gradeRadios.forEach(r => r.addEventListener('change', updateSubmitState));
+    });
+</script>
 {% endblock %}
